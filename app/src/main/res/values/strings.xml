@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">MoviesAAC</string>
+
+    <string name="btn_popular">Popular</string>
+    <string name="btn_top_rated">Top Rated</string>
+    <string name="btn_favorites">Favorites</string>
+    <string name="btn_add_one">Add +1</string>
+    <string name="btn_delete_all">Delete All</string>
+
+    <string name="error_db_empty">Database is empty</string>
+    <string name="error_api_empty">Error fetching API</string>
+
+    <string name="dummy_movie">Dummy Movie</string>
+    <string name="toast_db_insert">One movie inserted</string>
+    <string name="toast_db_delete">All movies deleted</string>
+
+</resources>
