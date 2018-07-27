@@ -1,4 +1,4 @@
-package com.example.djmso.moviesaac2;
+package com.example.djmso.moviesaac2.ui;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -6,7 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
 import com.example.djmso.moviesaac2.database.AppDatabase;
-import com.example.djmso.moviesaac2.database.Movie;
+import com.example.djmso.moviesaac2.model.Movie;
 
 import java.util.ArrayList;
 import java.util.List;

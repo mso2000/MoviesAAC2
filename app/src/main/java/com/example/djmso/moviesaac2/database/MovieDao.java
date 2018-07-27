@@ -5,6 +5,8 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import com.example.djmso.moviesaac2.model.Movie;
+
 import java.util.List;
 
 @Dao

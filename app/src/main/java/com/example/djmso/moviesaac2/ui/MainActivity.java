@@ -1,9 +1,9 @@
-package com.example.djmso.moviesaac2;
+package com.example.djmso.moviesaac2.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,20 +12,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.djmso.moviesaac2.AppExecutors;
+import com.example.djmso.moviesaac2.R;
 import com.example.djmso.moviesaac2.database.AppDatabase;
-import com.example.djmso.moviesaac2.database.Movie;
+import com.example.djmso.moviesaac2.model.Movie;
+import com.example.djmso.moviesaac2.model.MovieResponse;
+import com.example.djmso.moviesaac2.network.MovieClient;
+import com.example.djmso.moviesaac2.network.MovieService;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private final String API_KEY = BuildConfig.API_KEY;
-    private final String MOVIES_TOP_RATED
-            = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + API_KEY;
-    private final String MOVIES_POPULAR
-            = "https://api.themoviedb.org/3/movie/popular?api_key=" + API_KEY;
+public class MainActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private TextView resultsView;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         btnPopular.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadMovies(MainViewModel.API, MOVIES_POPULAR);
+                loadMovies(MainViewModel.API, MovieClient.SORT_BY_POPULAR);
             }
         });
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         btnTopRated.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadMovies(MainViewModel.API, MOVIES_TOP_RATED);
+                loadMovies(MainViewModel.API, MovieClient.SORT_BY_TOP_RATED);
             }
         });
 
@@ -126,11 +127,41 @@ public class MainActivity extends AppCompatActivity {
             mViewModel.getMoviesFromDb().removeObserver(mObserver);
         }
         displayProgress();
+
         if (source == MainViewModel.API) {
-            new MoviesTask(this).execute(sortOrder);
+            getMoviesFromAPI(sortOrder);
+
         } else {
             mViewModel.getMoviesFromDb().observe(this, mObserver);
         }
+    }
+
+    private void getMoviesFromAPI(String sortOrder) {
+        MovieService service = MovieClient.getRetrofitInstance().create(MovieService.class);
+        Call<MovieResponse> call = service.getMovies(sortOrder);
+        call.enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
+                MovieResponse movieResponse = response.body();
+                if (movieResponse == null) {
+                    displayError();
+                } else {
+                    mViewModel.setMoviesFromApi(response.body().getMoviesList());
+                    displayMovies(mViewModel.getMoviesFromApi());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MovieResponse> call, @NonNull Throwable t) {
+                displayError();
+            }
+        });
+    }
+
+    private void displayError() {
+        resultsView.setText(R.string.error_api_empty);
+        progressBar.setVisibility(View.GONE);
+        resultsView.setVisibility(View.VISIBLE);
     }
 
     private void displayProgress() {
@@ -156,34 +187,5 @@ public class MainActivity extends AppCompatActivity {
         resultsView.setText(movieList.toString());
         progressBar.setVisibility(View.GONE);
         resultsView.setVisibility(View.VISIBLE);
-    }
-
-    private static class MoviesTask extends AsyncTask<String, Void, String> {
-        private final WeakReference<MainActivity> activityReference;
-
-        MoviesTask(MainActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String searchUrl = params[0];
-            String response = null;
-            try {
-                response = Utils.getResponseFromHttpUrl(searchUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return response;
-        }
-
-        @Override
-        protected void onPostExecute(String results) {
-            MainActivity activity = activityReference.get();
-            if (activity == null || activity.isFinishing()) return;
-
-            activity.mViewModel.setMoviesFromApi(Utils.parseJSON(results));
-            activity.displayMovies(activity.mViewModel.getMoviesFromApi());
-        }
     }
 }

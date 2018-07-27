@@ -21,15 +21,31 @@ android {
     }
 }
 
+ext {
+    supportLibVersion = '27.1.1'
+    constraintLayoutLibVersion = '1.1.2'
+    retroFitLibVersion = '2.4.0'
+    aacLibVersion = '1.1.1'
+    testRunnerLibVersion = '1.0.2'
+    junitLibVersion = '4.12'
+    espressoLibVersion = '3.0.2'
+
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation 'android.arch.persistence.room:runtime:1.1.1'
-    annotationProcessor 'android.arch.lifecycle:compiler:1.1.1'
-    annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
+    implementation 'com.android.support:appcompat-v7:' + supportLibVersion
+    implementation 'com.android.support.constraint:constraint-layout:' + constraintLayoutLibVersion
+
+    implementation 'com.squareup.retrofit2:retrofit:' + retroFitLibVersion
+    implementation 'com.squareup.retrofit2:converter-gson:' + retroFitLibVersion
+
+    implementation 'android.arch.lifecycle:extensions:' + aacLibVersion
+    implementation 'android.arch.persistence.room:runtime:' + aacLibVersion
+    annotationProcessor 'android.arch.lifecycle:compiler:' + aacLibVersion
+    annotationProcessor 'android.arch.persistence.room:compiler:' + aacLibVersion
+
+    testImplementation 'junit:junit:' + junitLibVersion
+    androidTestImplementation 'com.android.support.test:runner:' + testRunnerLibVersion
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + espressoLibVersion
 }
